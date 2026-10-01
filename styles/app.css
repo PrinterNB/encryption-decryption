@@ -145,6 +145,12 @@ body {
 .badge-red { color: var(--red); font-weight: 700; }
 
 .notice-error { color: var(--red); background: none; border: 1px solid var(--red); padding: 8px 12px; border-radius: 8px; display: block; }
+
+.jserrorbox { /* filled by the inline handler in index.html — pinned so it shows even if layout broke */
+  position: fixed; top: 8px; left: 12px; right: 12px; z-index: 60;
+  color: var(--red); background: var(--panel); border: 2px solid var(--red);
+  padding: 8px 12px; border-radius: 8px; font: 13px/1.5 var(--mono);
+}
 .notice-warn, .notice-save { color: var(--amber); border: 1px solid var(--amber); padding: 8px 12px; border-radius: 8px; display: block; font-weight: 700; }
 .notice-info, .notice-file-ready { color: var(--ink-dim); border: 1px solid var(--line); padding: 6px 12px; border-radius: 8px; display: block; }
 

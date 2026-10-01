@@ -22,6 +22,13 @@ btnEl = function(label, handler, cls) {
   return b;
 };
 
+textareaValue = function(t) { // live text typed into a textarea — browsers keep it on .value, never in child nodes
+  var v = "";
+  try { v = t.value; } catch (e) { return ""; }
+  if (typeof v !== "string") return "";
+  return v.replace(/\r?\n$/, ""); // one trailing newline (what pasting often adds) is not part of the text
+};
+
 copyToClipboard = function(text) { // clipboard with old-browser fallback
   try {
     navigator.clipboard.writeText(text);
@@ -102,7 +109,7 @@ function renderTool(tab) {
       entries.map(function(e) {
         var selected = entry && e.id === entry.id;
         var chip = e.category === "modern" ? "modern" : (e.category === "encoding" ? "encoding" : "classic");
-        return btnEl(e.name, function() { selectAlgorithm(e.id); }, selected ? "selected" : "pick " + chip);
+        return btnEl(e.name, function() { selectAlgorithm(e.id); }, "pick " + chip + (selected ? " selected" : ""));
       })
     ));
   });
@@ -163,6 +170,9 @@ function renderTool(tab) {
   // --- run + output ---
   var runLabel = tab === "encrypt" ? "Encrypt it" : "Decrypt it";
   kids.push(btnEl(runLabel, function() {
+    // take the text from the box the user actually typed into — this is the one bridge
+    // between the DOM and STATE that every other panel already does for its control
+    if (!STATE.file) { var v = textareaValue(inputField); if (v !== STATE.text) setText(v); }
     if (tab === "encrypt") runEncrypt(); else runDecrypt();
   }, "runbtn"));
 

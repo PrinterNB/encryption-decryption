@@ -7,6 +7,27 @@
 <meta name="description" content="One page, every cipher: classic ciphers for learning, real AES for keeping secrets. Type text or drop a file; type your own key or generate one.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="styles/app.css">
+<script>
+/* Registered BEFORE any other script runs: if anything below ever throws, the page
+   says so on screen instead of sitting there blank. */
+function jsFailAt(where, msg, file, line) {
+  try {
+    var box = document.getElementById("jserrorbox");
+    if (box) {
+      box.hidden = false;
+      box.textContent = "Something is broken here: " + (msg || "unknown error") + " — at " + (file || where) + " line " + (line || "?") + ". Press F12 and open the console for details.";
+    }
+  } catch (e) { /* even the banner failed — nothing else we can do */ }
+}
+window.addEventListener("error", function(ev) {
+  var e2 = ev && ev.error;
+  jsFailAt("the page", e2 && e2.message, e2 && e2.filename, e2 && e2.lineno);
+});
+window.addEventListener("unhandledrejection", function(ev) {
+  var r = ev && ev.reason;
+  jsFailAt("an async step", r && (r.message || (typeof r === "string" ? r : "")), r && r.filename, r && r.lineno);
+});
+</script>
 <script defer src="js/registry.js"></script>
 <script defer src="js/ciphers/caesar.js"></script>
 <script defer src="js/ciphers/atbash.js"></script>
@@ -26,6 +47,7 @@
 <script defer src="js/ui.js"></script>
 </head>
 <body>
+<div id="jserrorbox" hidden></div>
 <noscript>This page needs JavaScript — every cipher runs in your browser, nothing is uploaded anywhere.</noscript>
 </body>
 </html>

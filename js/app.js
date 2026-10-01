@@ -22,6 +22,7 @@ function setNotice(kind, text) { STATE.notice = { kind: kind, text: text }; refr
 function clearNotice() { STATE.notice = null; }
 
 selectAlgorithm = function(id) {
+  clearNotice(); // an old message disappears when a new action begins
   if (!REG_BY_ID[id]) { setNotice("error", "unknown algorithm: " + id); return; }
   STATE.entryId = id;
   var entry = REG_BY_ID[id];
@@ -32,6 +33,7 @@ selectAlgorithm = function(id) {
 };
 
 setLevel = function(n) {
+  clearNotice();
   var entry = currentEntry();
   if (!entry || !entry.levels) { STATE.level = 1; }
   else STATE.level = Math.max(1, Math.min(entry.levels.max, n));
@@ -49,6 +51,7 @@ function validateKey() {
 }
 
 setTypedKey = function(k) {
+  clearNotice();
   STATE.typedKey = k; STATE.key = k; STATE.keySource = "typed";
   STATE.generatedKey = null;
   var err = validateKey();
@@ -58,6 +61,7 @@ setTypedKey = function(k) {
 };
 
 generateKey = function() {
+  clearNotice();
   var entry = currentEntry();
   if (!entry) return;
   if (!entry.keySpec.required) { setNotice("info", "This algorithm uses no key — there is nothing to generate."); return; }
@@ -69,6 +73,7 @@ generateKey = function() {
 };
 
 useKeycard = function(cardText) {
+  clearNotice();
   var parsed = parseKeycard(cardText);
   if (!parsed || !REG_BY_ID[parsed.entryId]) { setNotice("error", "That keycard is not recognised."); return; }
   STATE.entryId = parsed.entryId;
@@ -77,8 +82,9 @@ useKeycard = function(cardText) {
   refreshUI();
 };
 
-setText = function(t) { STATE.text = t; STATE.file = null; STATE.fileText = null; refreshUI(); };
+setText = function(t) { clearNotice(); STATE.text = t; STATE.file = null; STATE.fileText = null; refreshUI(); };
 dropFile = function(file) {
+  clearNotice();
   var entry = currentEntry();
   var max = (entry && entry.category === "modern") ? MAX_BYTES_MODERN : MAX_BYTES_CLASSICAL;
   if (file.size > max) {
@@ -90,9 +96,10 @@ dropFile = function(file) {
   refreshUI();
 };
 
-clearInput = function() { STATE.text = ""; STATE.file = null; STATE.fileText = null; refreshUI(); };
+clearInput = function() { clearNotice(); STATE.text = ""; STATE.file = null; STATE.fileText = null; refreshUI(); };
 
 runEncrypt = function() { // async — the caller shows nothing until this completes
+  clearNotice();
   var entry = currentEntry();
   if (!entry) { setNotice("error", "choose an algorithm first"); return; }
   var err = validateKey();
@@ -130,6 +137,7 @@ async function finishEncrypt(entry, input) {
 }
 
 runDecrypt = function() {
+  clearNotice();
   var entry = currentEntry();
   if (!entry) { setNotice("error", "choose an algorithm first"); return; }
   if (entry.keySpec.required && !STATE.key) { setNotice("error", "This algorithm needs its key to decrypt."); return; }

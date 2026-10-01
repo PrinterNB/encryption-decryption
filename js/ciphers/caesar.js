@@ -21,24 +21,20 @@ registerCipher({
   invented: "Used by Julius Caesar (~1st century BC)",
   description: [
     "Every letter is replaced by the letter a fixed number of places down the alphabet. Letters past Z wrap back to A. Numbers, spaces and punctuation are left untouched, and letter case is preserved.",
-    "The Level control stacks the cipher: each pass shifts the output again, so a higher level shifts everything by key × level in total — still one number holds the whole key."
+    "There is no key: the LEVEL control IS the secret — it sets the shift (1–25). Level 3 is the classic Caesar used by Julius himself."
   ],
   history: "Named after Julius Caesar, who reportedly used it to send military dispatches (with his lieutenant Mark, the shift was his favorite number). Its weakness was first exposed by Lu's frequency analysis in The Adventure of the Dancing Ciphers (1880s).",
-  strength: "Very weak. Only 25 possible keys — a computer tries them all instantly, and by hand you can crack it in seconds.",
-  example: { pt: "Meet at dawn", key: "7" },
-  keySpec: {
-    required: true, kind: "number",
-    validate: function(k) { return (/^\d+$/.test(k) && +k >= 1 && +k <= 25) ? null : "Shift must be a whole number from 1 to 25."; },
-    guidance: "The shift amount — a number from 1 to 25, e.g. 7."
-  },
+  strength: "Very weak. Only 25 possible shifts — a computer tries them all instantly, and by hand you can crack it in seconds.",
+  example: { pt: "Meet at dawn", key: "" },
+  keySpec: { required: false, kind: "none", guidance: "" },
   levels: {
-    max: 10, default: 1,
-    label: "pass count",
-    effect: "Applies the shift this many times (stacked Caesar passes)."
+    max: 25, default: 3,
+    label: "shift amount",
+    effect: "How many places each letter moves down the alphabet (1–25). Decrypt uses the same shift."
   },
-  encode: function(s, key, level) { return applyRounds(caesarEncode, level)(s, key); },
-  decode: function(s, key, level) { return applyRounds(caesarDecode, level)(s, key); },
-  selfTest: { input: "Attack at dawn, 9!", key: "5" }
+  encode: function(s, key, level) { return caesarMap(s, level); },
+  decode: function(s, key, level) { return caesarMap(s, 26 - (level % 26)); },
+  selfTest: { input: "Attack at dawn, 9!", key: "" }
 });
 
 registerCipher({
