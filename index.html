@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width">
 <title>Cipherbox — encrypt &amp; decrypt with classical and modern algorithms</title>
-<meta name="description" content="One page, every cipher: classic ciphers for learning, real AES for keeping secrets. Type text or drop a file; type your own key or generate one.">
+<meta name="description" content="One page, every cipher: classic ciphers for learning, real AES / ChaCha20 / RSA for keeping secrets, SHA-2 digests. Type text or drop a file; type your own key or generate one.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="styles/app.css">
 <script>
@@ -40,6 +40,9 @@ window.addEventListener("unhandledrejection", function(ev) {
 <script defer src="js/ciphers/xor.js"></script>
 <script defer src="js/ciphers/encodings.js"></script>
 <script defer src="js/ciphers/aes.js"></script>
+<script defer src="js/ciphers/chacha.js"></script>
+<script defer src="js/ciphers/rsa.js"></script>
+<script defer src="js/ciphers/hashes.js"></script>
 <script defer src="js/keygen.js"></script>
 <script defer src="js/fileinput.js"></script>
 <script defer src="js/verify.js"></script>

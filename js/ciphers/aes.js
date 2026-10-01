@@ -90,5 +90,6 @@ registerCipher({
   encode: aesEncode,
   decode: aesDecode,
   selfTest: { input: "AES round-trips anything.", key: "nine random words" },
-  notesSecurity: "real-crypto"
+  notesSecurity: "real-crypto",
+  randomized: true
 });

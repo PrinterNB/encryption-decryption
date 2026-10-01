@@ -86,7 +86,7 @@ function buildTabs() {
 }
 
 // ---------- the tool panel (shared by the Encrypt and Decrypt tabs) ----------
-CATEGORY_LABELS = { classical: "Classical ciphers (for learning)", encoding: "Encodings (for safe transport)", modern: "Modern cryptography (for real secrets)" };
+CATEGORY_LABELS = { classical: "Classical ciphers (for learning)", encoding: "Encodings (for safe transport)", modern: "Modern cryptography (for real secrets)", hashing: "One-way digests (fingerprints — they never go back)" };
 
 function renderTool(tab) {
   var entry = currentEntry();
@@ -101,14 +101,14 @@ function renderTool(tab) {
 
   // --- picker ---
   var groups = [];
-  ["classical", "encoding", "modern"].forEach(function(cat) {
+  ["classical", "encoding", "modern", "hashing"].forEach(function(cat) {
     var entries = REGISTRY.filter(function(e) { return e.category === cat; });
     if (!entries.length) return;
     groups.push(el("div", { class: "group" },
       el("div", { class: "grouplabel" }, CATEGORY_LABELS[cat]),
       entries.map(function(e) {
         var selected = entry && e.id === entry.id;
-        var chip = e.category === "modern" ? "modern" : (e.category === "encoding" ? "encoding" : "classic");
+        var chip = e.category === "modern" ? "modern" : (e.category === "encoding" ? "encoding" : (e.category === "hashing" ? "hash" : "classic"));
         return btnEl(e.name, function() { selectAlgorithm(e.id); }, "pick " + chip + (selected ? " selected" : ""));
       })
     ));
@@ -160,7 +160,7 @@ function renderTool(tab) {
     inputKids.push(el("div", { class: "filecard" }, "Using file: ", STATE.file.name, " (", Math.max(1, Math.round(STATE.file.size / 1024)), " KB) — clear the input to type text instead."));
   } else {
     inputKids.push(el("div", { class: "inputwrap" },
-      el("div", { class: "hint" }, tab === "encrypt" ? "Type or paste the text to encrypt:" : "Paste the ciphertext exactly as it was produced (start of the output box):"),
+      el("div", { class: "hint" }, tab === "encrypt" ? (entry && entry.oneWay ? "Type or paste the text to hash:" : "Type or paste the text to encrypt:") : "Paste the ciphertext exactly as it was produced (start of the output box):"),
       inputField));
   }
   inputKids.push(btnEl("Clear input", function() { clearInput(); }, "plainbtn"));
@@ -168,7 +168,7 @@ function renderTool(tab) {
   kids.push(el("div", { class: "inputpanel" }, inputKids));
 
   // --- run + output ---
-  var runLabel = tab === "encrypt" ? "Encrypt it" : "Decrypt it";
+  var runLabel = tab === "encrypt" ? (entry && entry.oneWay ? "Digest it" : "Encrypt it") : "Decrypt it";
   kids.push(btnEl(runLabel, function() {
     // take the text from the box the user actually typed into — this is the one bridge
     // between the DOM and STATE that every other panel already does for its control
@@ -178,7 +178,7 @@ function renderTool(tab) {
 
   if (STATE.output !== null) {
     var outKids = [
-      el("div", { class: "hint" }, tab === "encrypt" ? "Ciphertext (copy or save this — it is all you need to decrypt):" : "Recovered text:"),
+      el("div", { class: "hint" }, tab === "encrypt" ? (entry && entry.oneWay ? "Digest (copy it if you want to compare texts later — it never converts back):" : "Ciphertext (copy or save this — it is all you need to decrypt):") : "Recovered text:"),
       el("pre", { class: "outputbox", spellcheck: false }, STATE.output),
       btnEl("Copy output", function() { copyToClipboard(STATE.output); }, "copybtn")
     ];
@@ -188,8 +188,10 @@ function renderTool(tab) {
       outKids.push(el("div", { class: "badge-green" }, "Verified: decrypting this output with the same key and level gives back your exact input."));
     } else if (tab === "encrypt" && STATE.outputMeta && STATE.outputMeta.mode === "letters") {
       outKids.push(el("div", { class: "badge-amber" }, "Restored — modulo capitalisation and spacing: this cipher's alphabet cannot represent those, so the check compares letters only."));
+    } else if (tab === "encrypt" && STATE.outputMeta && STATE.outputMeta.mode === "one-way") {
+      outKids.push(el("div", { class: "badge-amber" }, "One-way by design: a digest has no decryption — the value shown is a fingerprint. Deterministic: the same text always prints the same value."));
     } else if (tab === "decrypt") {
-      outKids.push(el("div", { class: "badge-amber" }, "To check this is right, compare it against what you expect to see.", entry && entry.id === "aes" ? " (AES always produces a different ciphertext for the same text — that is why the whole 'aes1:…' line is needed to decrypt.)" : ""));
+      outKids.push(el("div", { class: "badge-amber" }, "To check this is right, compare it against what you expect to see.", entry && entry.randomized ? " (This algorithm starts fresh every run — that is why the whole output line is needed to decrypt.)" : ""));
     }
     kids.push(el("div", { class: "outputpanel" }, outKids));
   } else {
@@ -214,7 +216,7 @@ function renderLibrary() {
       } catch (err) { ct = "(example omitted)"; }
       built.push(el("div", { class: "card" },
         el("div", { class: "card-head" },
-          el("span", { class: "chip " + (e.category === "modern" ? "chip-modern" : e.category === "encoding" ? "chip-enc" : "chip-classic") }, e.category === "modern" ? "modern" : e.category === "encoding" ? "encoding" : "classic"),
+          el("span", { class: "chip " + (e.category === "modern" ? "chip-modern" : e.category === "encoding" ? "chip-enc" : e.category === "hashing" ? "chip-hash" : "chip-classic") }, e.category === "modern" ? "modern" : e.category === "encoding" ? "encoding" : e.category === "hashing" ? "digest" : "classic"),
           " ", e.name, " · ", e.era
         ),
         el("div", { class: "card-body" },

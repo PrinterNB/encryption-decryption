@@ -125,8 +125,12 @@ async function finishEncrypt(entry, input) {
   try {
     var ct = await entry.encode(input, STATE.key || "", STATE.level);
     STATE.output = ct;
-    var restored = await entry.decode(ct, STATE.key || "", STATE.level);
-    STATE.outputMeta = compareRoundTrip(entry, input, restored);
+    if (entry.oneWay) {
+      STATE.outputMeta = { ok: true, mode: "one-way" }; // no round-trip exists for digests — by design
+    } else {
+      var restored = await entry.decode(ct, STATE.key || "", STATE.level);
+      STATE.outputMeta = compareRoundTrip(entry, input, restored);
+    }
   } catch (e) {
     STATE.output = null; STATE.outputMeta = null;
     setNotice("error", (e && e.message) ? e.message : String(e));

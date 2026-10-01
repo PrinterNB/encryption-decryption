@@ -68,6 +68,7 @@ body {
 .pick.classic { border-left: 3px solid #8b6d3d; }
 .pick.encoding { border-left: 3px solid #6b7280; }
 .pick.modern { border-left: 3px solid var(--accent); }
+.pick.hash { border-left: 3px solid #2f5d50; }
 .pick.selected, .pick.selected.pick { border: 2px solid var(--accent); font-weight: 700; }
 
 .section-head { font-weight: 700; margin: 4px 0; }
@@ -171,6 +172,7 @@ body {
 .chip-classic { background: #8b6d3d; color: #fff; }
 .chip-enc { background: #6b7280; color: #fff; }
 .chip-modern { background: var(--accent); color: #fff; }
+.chip-hash { background: #2f5d50; color: #fff; }
 .card-body p { margin: 6px 0; }
 .card-body.hist { color: var(--ink-dim); font-style: italic; }
 .card-body.strength { color: var(--amber); font-weight: 600; }
