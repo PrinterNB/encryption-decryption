@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Self-test — every registered cipher must round-trip</title>
+<link rel="stylesheet" href="../styles/app.css">
+<script defer src="../js/registry.js"></script>
+<script defer src="../js/ciphers/caesar.js"></script>
+<script defer src="../js/ciphers/atbash.js"></script>
+<script defer src="../js/ciphers/keyword.js"></script>
+<script defer src="../js/ciphers/vigenere.js"></script>
+<script defer src="../js/ciphers/autokey.js"></script>
+<script defer src="../js/ciphers/playfair.js"></script>
+<script defer src="../js/ciphers/railfence.js"></script>
+<script defer src="../js/ciphers/bacon.js"></script>
+<script defer src="../js/ciphers/xor.js"></script>
+<script defer src="../js/ciphers/encodings.js"></script>
+<script defer src="../js/ciphers/aes.js"></script>
+<script defer src="../js/verify.js"></script>
+<script defer src="../js/selftest.js"></script>
+</head>
+<body>
+<h1>Cipher self-test</h1>
+<p>Every algorithm registered in <code>js/registry.js</code> is encrypted with its test input, decrypted back, and compared. Open this page in a browser — if anything below says FAIL, a cipher is broken.</p>
+<pre id="results" style="font-family:monospace">running…</pre>
+</body>
+</html>
