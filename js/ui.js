@@ -243,9 +243,9 @@ function refreshUI() {
 }
 
 function boot() {
+  buildTabs(); // header first so it sits above the app, not after it
   ROOT = el("div", { class: "app" });
   document.body.appendChild(ROOT);
-  buildTabs();
   TOOLPANEL = el("div", { class: "toolpanel" });
   TOOLPANEL.hidden = true;
   ROOT.appendChild(TOOLPANEL);

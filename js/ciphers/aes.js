@@ -68,7 +68,7 @@ registerCipher({
   description: [
     "The workhorse of real cryptography today: every byte affects every other (substitution, shifting, mixing in a Galois field), for 14 rounds with a 256-bit key.",
     "Your key is treated as a PASSPHRASE. It is stretched by thousands of PBKDF2 rounds with a fresh random salt, and every message gets a fresh random IV — the same text + same key encrypts differently every time.",
-    "GAEAD-style authenticity: a one-character change in the ciphertext makes decryption FAIL rather than return garbage.",
+    "Built-in authenticity tag: change one character of the ciphertext and decryption FAILS instead of quietly returning garbage — you can always tell a wrong key or a corrupted paste.",
     "Because every run is fresh, decrypting needs the full ciphertext output (the leading 'aes1:…' part) — never just the key."
   ],
   history: "Invented by Joan Daemen and Vincent Rijmen (hence AES); won the NIST contest in 2001 and is now the standard inside TLS, zip files and operating systems worldwide.",
