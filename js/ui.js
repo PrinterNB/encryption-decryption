@@ -1,23 +1,19 @@
 // ui.js — owns the DOM only; all facts live in app.js (STATE). Loaded LAST, so
 // everything it calls (registerCipher output, app functions) already exists.
 
-el = function(tag, attrs, kids) {
+el = function(tag, attrs) { // children may be passed as any number of extra args;
+  // strings/numbers become text nodes, arrays are flattened recursively, nulls skipped
   var n = document.createElement(tag);
   if (attrs) { for (var k in attrs) { if (attrs[k] !== null) n.setAttribute(k, String(attrs[k])); } }
-  for (var i = 0; i < kids.length; i++) {
-    var kid = kids[i];
-    if (kid === null || kid === undefined || kid === false) continue;
-    if (typeof kid === "string" || typeof kid === "number") n.appendChild(document.createTextNode(String(kid)));
-    else if (Array.isArray(kid)) {
-      for (var j = 0; j < kid.length; j++) {
-        var sub = kid[j];
-        if (typeof sub === "string") n.appendChild(document.createTextNode(sub));
-        else if (sub) n.appendChild(sub);
-      }
-    }
-    else n.appendChild(kid);
-  }
+  for (var i = 2; i < arguments.length; i++) appendKid(n, arguments[i]);
   return n;
+};
+
+appendKid = function(parent, kid) {
+  if (kid === null || kid === undefined || kid === false) return;
+  if (typeof kid === "string" || typeof kid === "number") { parent.appendChild(document.createTextNode(String(kid))); return; }
+  if (Array.isArray(kid)) { for (var j = 0; j < kid.length; j++) appendKid(parent, kid[j]); return; }
+  parent.appendChild(kid);
 };
 
 btnEl = function(label, handler, cls) {
@@ -173,7 +169,7 @@ function renderTool(tab) {
   if (STATE.output !== null) {
     var outKids = [
       el("div", { class: "hint" }, tab === "encrypt" ? "Ciphertext (copy or save this — it is all you need to decrypt):" : "Recovered text:"),
-      outputPre,
+      el("pre", { class: "outputbox", spellcheck: false }, STATE.output),
       btnEl("Copy output", function() { copyToClipboard(STATE.output); }, "copybtn")
     ];
     if (STATE.outputMeta && STATE.outputMeta.where !== undefined && STATE.outputMeta.where !== -1 && STATE.outputMeta.where !== null) {
@@ -195,10 +191,10 @@ function renderTool(tab) {
 
 // ---------- library ----------
 function renderLibrary() {
-  var cards = [];
   var entries = REGISTRY.slice();
-  (async function() {
+  renderLibraryAsync = (async function() { // returned so callers (debug/tests) can await; failures are surfaced, not swallowed
     var built = [];
+    try {
     for (var i = 0; i < entries.length; i++) {
       var e = entries[i];
       var ct = "";
@@ -222,6 +218,7 @@ function renderLibrary() {
       ));
     }
     LIBPANEL.replaceChildren.apply(LIBPANEL, built);
+    } catch (err) { console.error("[cipherbox] library render failed:", err); }
     LIB_RENDERING = false;
   })();
 }
